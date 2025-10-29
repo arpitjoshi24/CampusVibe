@@ -1,22 +1,35 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import Addevent from "./pages/Addevent";
-import Eventpage from "./pages/Eventpage";
+import Footer from "./components/Footer";
+
+// Pages
 import Home from "./pages/Home";
+import Eventpage from "./pages/Eventpage";
 import Pevent from "./pages/Pevent";
+import Addevent from "./pages/Addevent";
 import Register from "./pages/Register";
+import Login from "./pages/Login"; // ✅ Add this import
 
 function App() {
   return (
     <Router>
+      {/* Navbar stays visible on all pages */}
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/events" element={<Eventpage />} />
-        <Route path="/pevent" element={<Pevent />} />
-        <Route path="/addevent" element={<Addevent />} />
-        <Route path="/register" element={<Register />} />
-      </Routes>
+
+      {/* Main content area */}
+      <main className="min-h-screen">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/events" element={<Eventpage />} />
+          <Route path="/pevent" element={<Pevent />} />
+          <Route path="/addevent" element={<Addevent />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/signin" element={<Login />} /> {/* ✅ Added route */}
+        </Routes>
+      </main>
+
+      {/* Footer stays visible on all pages */}
+      <Footer />
     </Router>
   );
 }
