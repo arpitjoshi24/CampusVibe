@@ -7,21 +7,38 @@ export default function Login() {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setError('')
 
-    // Dummy credentials
-    const dummyEmail = 'test@example.com'
-    const dummyPassword = '123456'
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      })
 
-    if (email === dummyEmail && password === dummyPassword) {
-      // Save user info to localStorage
-      localStorage.setItem('user', JSON.stringify({ email }))
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.message || 'Invalid email or password')
+        return
+      }
+
+      // ✅ Save token + user info in localStorage
+      localStorage.setItem('user', JSON.stringify(data))
+      localStorage.setItem('token', data.token)
+
+      // ✅ Manually trigger a storage event (so Navbar updates instantly)
+      window.dispatchEvent(new Event('storage'))
 
       alert('Login Successful!')
-      navigate('/') // Redirect to homepage
-    } else {
-      setError('Invalid email or password')
+      navigate('/')
+    } catch (err) {
+      console.error(err)
+      setError('Server error. Please try again.')
     }
   }
 
@@ -37,7 +54,6 @@ export default function Login() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email Input */}
           <div>
             <label className="block text-gray-300 text-sm font-medium mb-2">Email</label>
             <input
@@ -50,7 +66,6 @@ export default function Login() {
             />
           </div>
 
-          {/* Password Input */}
           <div>
             <label className="block text-gray-300 text-sm font-medium mb-2">Password</label>
             <input
@@ -63,7 +78,6 @@ export default function Login() {
             />
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300"

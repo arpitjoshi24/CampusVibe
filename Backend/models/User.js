@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
-import bcrypt from 'bcryptjs';
 import sequelize from '../config/db.js';
+import bcrypt from 'bcryptjs';
 
 const User = sequelize.define('User', {
   email: {
@@ -14,13 +14,12 @@ const User = sequelize.define('User', {
   },
 });
 
-// Hash password before creating
+// 🔒 Hash password before saving
 User.beforeCreate(async (user) => {
-  const salt = await bcrypt.genSalt(10);
-  user.password = await bcrypt.hash(user.password, salt);
+  user.password = await bcrypt.hash(user.password, 10);
 });
 
-// Compare password
+// 🔑 Method to check password
 User.prototype.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

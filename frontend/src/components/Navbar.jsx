@@ -5,21 +5,34 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const navigate = useNavigate()
 
-  // Check login status on mount
+  // ✅ Check login status initially + when storage changes
   useEffect(() => {
-    const user = localStorage.getItem('user')
-    if (user) setIsLoggedIn(true)
+    const checkLoginStatus = () => {
+      const user = localStorage.getItem('user')
+      setIsLoggedIn(!!user)
+    }
+
+    checkLoginStatus()
+
+    // ✅ Listen for changes to localStorage (cross-component)
+    window.addEventListener('storage', checkLoginStatus)
+
+    return () => window.removeEventListener('storage', checkLoginStatus)
   }, [])
 
+  // ✅ Correct Logout Function
   const handleLogout = () => {
     localStorage.removeItem('user')
-    setIsLoggedIn(false)
+    localStorage.removeItem('token')
+    window.dispatchEvent(new Event('storage')) // trigger navbar update
+
+    alert('Logged out successfully!')
     navigate('/')
   }
 
   return (
     <nav className='flex items-center px-8 py-4 bg-slate-900/80 backdrop-blur-lg border-b border-white/10 justify-between sticky top-0 z-50'>
-      {/* Logo/Brand */}
+      {/* Logo */}
       <div className='flex items-center'>
         <Link
           to="/"
@@ -29,7 +42,7 @@ export default function Navbar() {
         </Link>
       </div>
 
-      {/* Navigation Links */}
+      {/* Nav Links */}
       <div className='flex items-center'>
         <ul className='flex gap-2 items-center bg-white/5 backdrop-blur-lg rounded-2xl p-1 border border-white/10'>
           {['Home', 'Events', 'Clubs', 'About'].map((item) => (
