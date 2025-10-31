@@ -9,6 +9,7 @@ import Pevent from "./pages/Pevent";
 import Addevent from "./pages/Addevent";
 import Register from "./pages/Register";
 import Login from "./pages/Login"; // ✅ Add this import
+import NeedResources from "./pages/NeedResources";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/pevent" element={<Pevent />} />
           <Route path="/addevent" element={<Addevent />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/resources" element={<NeedResources/>} />
           <Route path="/signin" element={<Login />} /> {/* ✅ Added route */}
         </Routes>
       </main>

@@ -5,7 +5,7 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const navigate = useNavigate()
 
-  // ✅ Check login status initially + when storage changes
+  // ✅ Check login status
   useEffect(() => {
     const checkLoginStatus = () => {
       const user = localStorage.getItem('user')
@@ -13,19 +13,15 @@ export default function Navbar() {
     }
 
     checkLoginStatus()
-
-    // ✅ Listen for changes to localStorage (cross-component)
     window.addEventListener('storage', checkLoginStatus)
-
     return () => window.removeEventListener('storage', checkLoginStatus)
   }, [])
 
-  // ✅ Correct Logout Function
+  // ✅ Logout
   const handleLogout = () => {
     localStorage.removeItem('user')
     localStorage.removeItem('token')
-    window.dispatchEvent(new Event('storage')) // trigger navbar update
-
+    window.dispatchEvent(new Event('storage'))
     alert('Logged out successfully!')
     navigate('/')
   }
@@ -70,10 +66,18 @@ export default function Navbar() {
           <>
             <Link
               to="/addevent"
-              className='bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105'
+              className='bg-gradient-to-r from-purple-500 to-pink-500 text-white px-5 py-3 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105'
             >
               Add Event
             </Link>
+
+            <Link
+              to="/resources"
+              className='bg-gradient-to-r from-pink-500 to-red-500 text-white px-5 py-3 rounded-xl font-semibold hover:from-pink-600 hover:to-red-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105'
+            >
+             Need Resources
+            </Link>
+
             <button
               onClick={handleLogout}
               className='text-gray-300 hover:text-white transition-all duration-200'
