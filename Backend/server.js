@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import sequelize from './config/db.js';
+import sequelize, { connectDB } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import eventRoutes from './routes/eventRoutes.js';
 import requirementRoutes from './routes/requirementRoutes.js';
@@ -12,7 +12,6 @@ import Event from './models/Event.js';
 
 dotenv.config();
 
-// Express setup
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -24,15 +23,14 @@ const __dirname = path.dirname(__filename);
 // ✅ Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// ✅ Database connection
+// ✅ Database connection & sync
 (async () => {
   try {
-    await sequelize.authenticate();
-    console.log('✅ Database connected');
+    await connectDB(); // connect to Neon
     await sequelize.sync({ alter: true });
-    console.log('✅ Models synced');
+    console.log('✅ Sequelize models synced with Neon DB');
   } catch (err) {
-    console.error('❌ DB connection failed:', err.message);
+    console.error('❌ DB connection or sync failed:', err.message);
   }
 })();
 
@@ -40,9 +38,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/requirements', requirementRoutes);
+
 // ✅ Default route
 app.get('/', (req, res) => {
-  res.send('🚀 Hackathon Server is Running!');
+  res.send('🚀 Backend server running with Neon PostgreSQL!');
 });
 
 // ✅ Start server
