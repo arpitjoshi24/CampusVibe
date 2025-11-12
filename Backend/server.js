@@ -3,12 +3,22 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import sequelize, { connectDB } from './config/db.js';
+import { connectDB } from './config/db.js'; // Use your Neon db.js
+import db from './models/index.js'; // Import the new model hub
+import cron from 'node-cron';
+
+// --- (Step 1) IMPORT ALL 9 ROUTE FILES ---
 import authRoutes from './routes/authRoutes.js';
 import eventRoutes from './routes/eventRoutes.js';
 import requirementRoutes from './routes/requirementRoutes.js';
-import User from './models/User.js';
-import Event from './models/Event.js';
+import adminRoutes from './routes/adminRoutes.js';
+import organizerRoutes from './routes/organizerRoutes.js';
+import registrationRoutes from './routes/registrationRoutes.js';
+import clubRoutes from './routes/clubRoutes.js';
+import attendanceRoutes from './routes/attendanceRoutes.js';
+
+// --- (Step 2) IMPORT AUTOMATION CONTROLLER ---
+import { runOffboardingScript, sendExpiryWarning } from './controllers/automationController.js';
 
 dotenv.config();
 
@@ -27,21 +37,43 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 (async () => {
   try {
     await connectDB(); // connect to Neon
-    await sequelize.sync({ alter: true });
+    
+    // -----------------------------------------------------------------
+    // ----------------- (Step 3) SYNC DATABASE -----------------
+    // All associations are now defined in './models/index.js'
+    // -----------------------------------------------------------------
+    
+    await db.sequelize.sync({ alter: true });
     console.log('✅ Sequelize models synced with Neon DB');
   } catch (err) {
     console.error('❌ DB connection or sync failed:', err.message);
   }
 })();
 
-// ✅ Routes
+// --- (Step 4) USE ALL 9 ROUTE FILES ---
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/requirements', requirementRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/organizer', organizerRoutes);
+app.use('/api/register', registrationRoutes);
+app.use('/api/clubs', clubRoutes);
+app.use('/api/attendance', attendanceRoutes);
 
 // ✅ Default route
 app.get('/', (req, res) => {
   res.send('🚀 Backend server running with Neon PostgreSQL!');
+});
+
+// --- (Step 5) SETUP AUTOMATION SCRIPT ---
+// Runs every day at 1 AM
+cron.schedule('0 1 * * *', async () => {
+  console.log('--- Running Daily Automation Tasks ---');
+  await runOffboardingScript();
+  await sendExpiryWarning();
+  console.log('--- Daily Tasks Complete ---');
+}, {
+  timezone: "Asia/Kolkata" // Set to your server's timezone
 });
 
 // ✅ Start server

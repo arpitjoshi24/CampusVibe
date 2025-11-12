@@ -1,99 +1,69 @@
-import React, { useEffect, useState } from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import React from 'react';
+import { Link, NavLink } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const navigate = useNavigate()
+  const { user, logout } = useAuth();
 
-  // ✅ Check login status
-  useEffect(() => {
-    const checkLoginStatus = () => {
-      const user = localStorage.getItem('user')
-      setIsLoggedIn(!!user)
-    }
-
-    checkLoginStatus()
-    window.addEventListener('storage', checkLoginStatus)
-    return () => window.removeEventListener('storage', checkLoginStatus)
-  }, [])
-
-  // ✅ Logout
-  const handleLogout = () => {
-    localStorage.removeItem('user')
-    localStorage.removeItem('token')
-    window.dispatchEvent(new Event('storage'))
-    alert('Logged out successfully!')
-    navigate('/')
-  }
+  const isAdmin = user && user.role === 'Admin';
+  const canOrganize = user && (user.role.includes('Organizer') || isAdmin);
 
   return (
     <nav className='flex items-center px-8 py-4 bg-slate-900/80 backdrop-blur-lg border-b border-white/10 justify-between sticky top-0 z-50'>
-      {/* Logo */}
       <div className='flex items-center'>
-        <Link
-          to="/"
-          className='text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent cursor-pointer hover:from-purple-300 hover:to-pink-300 transition-all duration-300'
-        >
+        <Link to="/" className='text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent'>
           CampusVibe
         </Link>
       </div>
 
-      {/* Nav Links */}
       <div className='flex items-center'>
         <ul className='flex gap-2 items-center bg-white/5 backdrop-blur-lg rounded-2xl p-1 border border-white/10'>
-          {['Home', 'Events', 'Clubs', 'About'].map((item) => (
-            <li key={item}>
-              <NavLink
-                to={item === 'Home' ? '/' : `/${item.toLowerCase()}`}
-                className={({ isActive }) =>
-                  `font-medium py-3 px-6 rounded-xl transition-all duration-300 ${
-                    isActive
-                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
-                      : 'text-gray-300 hover:text-white hover:bg-white/5'
-                  }`
-                }
-              >
-                {item}
-              </NavLink>
-            </li>
-          ))}
+          <NavButton to="/">Home</NavButton>
+          <NavButton to="/events">Events</NavButton>
+          <NavButton to="/clubs">Clubs</NavButton>
+          {isAdmin && <NavButton to="/admin/dashboard">Admin</NavButton>}
+          {canOrganize && <NavButton to="/organizer/dashboard">My Dashboard</NavButton>}
         </ul>
       </div>
 
-      {/* User Actions */}
       <div className='flex items-center gap-4'>
-        {isLoggedIn ? (
+        {user ? (
           <>
-            <Link
-              to="/addevent"
-              className='bg-gradient-to-r from-purple-500 to-pink-500 text-white px-5 py-3 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105'
-            >
-              Add Event
-            </Link>
-
-            <Link
-              to="/resources"
-              className='bg-gradient-to-r from-pink-500 to-red-500 text-white px-5 py-3 rounded-xl font-semibold hover:from-pink-600 hover:to-red-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105'
-            >
-             Need Resources
-            </Link>
-
-            <button
-              onClick={handleLogout}
-              className='text-gray-300 hover:text-white transition-all duration-200'
-            >
+            {canOrganize && (
+              <Link to="/addevent" className='bg-gradient-to-r from-purple-500 to-pink-500 text-white px-5 py-3 rounded-xl font-semibold'>
+                Add Event
+              </Link>
+            )}
+            {/* Link to resources is now on the Organizer Dashboard, not Navbar */}
+            <button onClick={logout} className='text-gray-300 hover:text-white'>
               Logout
             </button>
           </>
         ) : (
-          <Link
-            to="/signin"
-            className='bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105'
-          >
-            Sign In
-          </Link>
+          <>
+            <Link to="/request-event" className='bg-white/10 text-white px-5 py-3 rounded-xl font-semibold'>
+              Organize an Event
+            </Link>
+            <Link to="/signin" className='bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl font-semibold'>
+              Sign In
+            </Link>
+          </>
         )}
       </div>
     </nav>
-  )
+  );
 }
+
+// Helper component
+const NavButton = ({ to, children }) => (
+  <li>
+    <NavLink
+      to={to}
+      className={({ isActive }) =>
+        `font-medium py-3 px-6 rounded-xl ${isActive ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' : 'text-gray-300 hover:text-white'}`
+      }
+    >
+      {children}
+    </NavLink>
+  </li>
+);

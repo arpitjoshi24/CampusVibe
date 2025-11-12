@@ -1,1 +1,34 @@
 @import "tailwindcss";
+
+/* These are the new helper classes that our 
+  refactored forms (Addevent, NeedResources, etc.) depend on.
+*/
+@layer components {
+  .input-field {
+    @apply w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors duration-200;
+  }
+  
+  .input-file {
+    @apply w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-500 file:text-white hover:file:bg-purple-600 transition-colors duration-200;
+  }
+
+  .admin-button {
+    @apply bg-purple-500/20 text-purple-300 px-4 py-3 rounded-lg font-semibold hover:bg-purple-500/40 transition-all;
+  }
+}
+
+@layer components {
+  /* ... (your existing .input-field, .input-file) ... */
+  
+  .admin-button {
+    @apply bg-purple-500/20 text-purple-300 px-4 py-3 rounded-lg font-semibold hover:bg-purple-500/40 transition-all;
+  }
+  
+  .admin-button-green {
+    @apply bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg font-semibold transition-colors;
+  }
+  
+  .admin-button-red {
+    @apply bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg font-semibold transition-colors;
+  }
+}

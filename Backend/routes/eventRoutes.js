@@ -1,26 +1,37 @@
 import express from 'express';
-import multer from 'multer';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { addEvent, getEvents } from '../controllers/eventController.js';
+import { addEvent, getEvents, getEventById, deleteEvent } from '../controllers/eventController.js';
+import { protect, isOrganizer, checkPasswordChange } from '../middleware/authMiddleware.js';
+import { uploadEventWizard } from '../utils/fileUploads.js'; // <-- CORRECTED IMPORT
 
 const router = express.Router();
 
-// 🧠 Setup Multer
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// --- PUBLIC ROUTES (for "Public User" lane) ---
 
-const storage = multer.diskStorage({
-  destination: path.join(__dirname, '../uploads'),
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
-  },
-});
-
-const upload = multer({ storage });
-
-// 🧩 Routes
-router.post('/', upload.single('banner'), addEvent);
+// ✅ GET all events (for Eventpage.jsx)
 router.get('/', getEvents);
+
+// ✅ GET one event's details (for the "Unified Event Dashboard")
+router.get('/:id', getEventById);
+
+// --- PROTECTED ROUTES (for "Organizer" & "Admin" lanes) ---
+
+// ✅ POST to create a new event (the "Add Event" wizard)
+router.post(
+  '/',
+  protect,
+  checkPasswordChange,
+  isOrganizer,
+  uploadEventWizard, // <-- CORRECTED HANDLER
+  addEvent
+);
+
+// ✅ DELETE an event (Manual Deletion)
+router.delete(
+  '/:id',
+  protect,
+  checkPasswordChange,
+  isOrganizer,
+  deleteEvent
+);
 
 export default router;

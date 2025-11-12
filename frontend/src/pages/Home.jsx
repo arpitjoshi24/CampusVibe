@@ -1,35 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Home() {
-  const events = [
-    {
-      title: "Tech Fest 2024",
-      date: "Dec 15",
-      location: "Main Auditorium",
-      type: "Workshop",
-      attendees: 247
-    },
-    {
-      title: "Cultural Night",
-      date: "Dec 18",
-      location: "University Grounds",
-      type: "Social",
-      attendees: 512
-    },
-    {
-      title: "Career Fair",
-      date: "Dec 20",
-      location: "Student Center",
-      type: "Career",
-      attendees: 189
-    }
-  ];
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  // Fetch real events from backend, replacing the hardcoded ones
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        // Fetch from the public 'GET /api/events' route
+        const res = await fetch('http://localhost:5000/api/events');
+        if (!res.ok) throw new Error('Failed to fetch events');
+        const data = await res.json();
+        // Just show the first 3 upcoming events on the homepage
+        setEvents(data.slice(0, 3)); 
+      } catch (err) {
+        console.error("Error fetching events:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvents();
+  }, []);
+  
+  // This is from your original file, we'll keep it
   const features = [
     {
-      icon: "🎉",
+      icon: "📅",
       title: "Events & Activities",
-      description: "Discover campus events, parties, workshops, and social gatherings happening around you."
+      description: "Discover campus events, parties, workshops, and social gatherings."
     },
     {
       icon: "👥",
@@ -37,23 +38,16 @@ export default function Home() {
       description: "Join student organizations, find like-minded peers, and build your campus network."
     },
     {
-      icon: "📱",
+      icon: "🌐",
       title: "Campus Connect",
       description: "Stay updated with campus news, announcements, and connect with your community."
     }
   ];
 
-  const getTypeColor = (type) => {
-    const colors = {
-      Workshop: 'bg-purple-500',
-      Social: 'bg-pink-500',
-      Career: 'bg-blue-500'
-    };
-    return colors[type] || 'bg-gray-500';
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    // We are keeping your exact layout and theme colors
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
+      
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-32 pb-20 px-8">
         <div className="absolute inset-0 bg-black/40 z-0"></div>
@@ -65,17 +59,24 @@ export default function Home() {
             Your gateway to campus life. Discover events, join clubs, and connect with your community.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
-            <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+            {/* UPDATED: Buttons now use <Link> and point to the correct routes */}
+            <Link 
+              to="/events" 
+              className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            >
               Explore Events
-            </button>
-            <button className="border-2 border-white/30 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-slate-900 transition-all duration-300 backdrop-blur-sm">
-              Join Campus
-            </button>
+            </Link>
+            <Link 
+              to="/request-event" 
+              className="border-2 border-white/30 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-slate-900 transition-all duration-300 backdrop-blur-sm"
+            >
+              Organize an Event
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features Section (Keeping your original 'Why Choose') */}
       <section className="py-16 px-8">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-4xl font-bold text-center text-white mb-12">
@@ -102,51 +103,27 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Upcoming Events */}
+      {/* Upcoming Events (Now Dynamic) */}
       <section className="py-16 px-8 bg-black/20">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-4xl font-bold text-center text-white mb-12">
             Upcoming <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Events</span>
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {events.map((event, index) => (
-              <div 
-                key={index}
-                className="group bg-white/5 backdrop-blur-lg rounded-3xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-500 hover:transform hover:-translate-y-2"
-              >
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <span className={`${getTypeColor(event.type)} text-white px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm`}>
-                      {event.type}
-                    </span>
-                    <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                      {event.date}
-                    </span>
-                  </div>
-                  <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-purple-300 transition-colors">
-                    {event.title}
-                  </h3>
-                  <div className="flex items-center justify-between text-gray-400 mb-6">
-                    <div className="flex items-center gap-2">
-                      <span>📍</span>
-                      <span>{event.location}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span>👥</span>
-                      <span>{event.attendees}</span>
-                    </div>
-                  </div>
-                  <button className="w-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-white py-3 rounded-xl font-semibold hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 border border-white/10 backdrop-blur-sm">
-                    Learn More
-                  </button>
-                </div>
-              </div>
-            ))}
+            {loading ? (
+              <p className="col-span-3 text-center text-gray-400">Loading events...</p>
+            ) : events.length > 0 ? (
+              events.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))
+            ) : (
+              <p className="col-span-3 text-center text-gray-400">No upcoming events found.</p>
+            )}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* CTA Section (No changes needed) */}
       <section className="py-20 px-8">
         <div className="max-w-4xl mx-auto text-center">
           <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-3xl p-12 border border-white/10 backdrop-blur-lg">
@@ -157,12 +134,9 @@ export default function Home() {
               Join thousands of students already using CampusVibe to enhance their college experience.
             </p>
             <div className="flex gap-4 justify-center flex-wrap">
-              <button className="bg-white text-slate-900 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-2xl">
+              <Link to="/events" className="bg-white text-slate-900 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-2xl">
                 Get Started
-              </button>
-              <button className="border-2 border-white text-white px-8 py-4 rounded-xl font-bold hover:bg-white hover:text-slate-900 transition-all duration-300 backdrop-blur-sm">
-                Learn More
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -170,3 +144,46 @@ export default function Home() {
     </div>
   );
 }
+
+// Helper component for the event card
+const EventCard = ({ event }) => (
+  <div 
+    className="group bg-white/5 backdrop-blur-lg rounded-3xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-500 hover:transform hover:-translate-y-2"
+  >
+    {/* UPDATED: Use bannerUrl from our new 'Event' model */}
+    <img
+      src={event.bannerUrl ? `http://localhost:5000${event.bannerUrl}` : 'https://images.unsplash.com/photo-1511578314322-379afb476865?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzNTU2MDB8MHwxfHNlYXJjaHw0fHxldmVudHxlbnwwfHx8fDE2OTg0MTc5NTJ8MA&ixlib.rb-4.0.3&q=80&w=1080'}
+      alt={event.eventName}
+      className="w-full h-48 object-cover"
+    />
+    <div className="p-6">
+      <div className="flex justify-between items-start mb-4">
+        {/* UPDATED: Use 'registrationType' from our new 'Event' model */}
+        <span className="bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+          {event.registrationType || 'Event'}
+        </span>
+        {/* UPDATED: Use 'startTime' from our new 'Event' model */}
+        <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          {new Date(event.startTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+        </span>
+      </div>
+      <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-purple-300 transition-colors">
+        {event.eventName}
+      </h3>
+      <div className="flex items-center justify-between text-gray-400 mb-6">
+        <span>📍 {event.venue}</span>
+        {/* UPDATED: Use 'isPaidEvent' from our new 'Event' model */}
+        <span className={event.isPaidEvent ? "text-green-400" : ""}>
+          {event.isPaidEvent ? 'Paid' : 'Free'}
+        </span>
+      </div>
+      {/* UPDATED: This now links to the new 'EventDashboard' page */}
+      <Link 
+        to={`/events/${event.id}`} 
+        className="w-full text-center block bg-white/10 text-white py-3 rounded-xl font-semibold hover:bg-white/20 transition-all"
+      >
+        Learn More
+      </Link>
+    </div>
+  </div>
+);

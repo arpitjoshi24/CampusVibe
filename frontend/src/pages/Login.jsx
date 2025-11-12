@@ -1,50 +1,38 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useState } from 'react';
+import { useAuth } from '../hooks/useAuth'; // <-- Import our new auth hook
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const navigate = useNavigate()
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  
+  const { login } = useAuth(); // <-- Get the login function from the context
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError('')
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        setError(data.message || 'Invalid email or password')
-        return
-      }
-
-      // ✅ Save token + user info in localStorage
-      localStorage.setItem('user', JSON.stringify(data))
-      localStorage.setItem('token', data.token)
-
-      // ✅ Manually trigger a storage event (so Navbar updates instantly)
-      window.dispatchEvent(new Event('storage'))
-
-      alert('Login Successful!')
-      navigate('/')
+      // Call the login function from the context
+      await login(email, password);
+      // Navigation is now handled *inside* AuthContext.jsx
+      
     } catch (err) {
-      console.error(err)
-      setError('Server error. Please try again.')
+      console.error(err);
+      setError(err.message || 'Server error. Please try again.');
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
   return (
+    // Re-using your original dark theme and layout
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-      <div className="bg-white/5 backdrop-blur-lg rounded-3xl border border-white/10 p-8 w-full max-w-md">
+      <form onSubmit={handleSubmit} className="bg-white/5 backdrop-blur-lg rounded-3xl border border-white/10 p-8 w-full max-w-md">
         <h2 className="text-3xl font-bold text-white text-center mb-6">Login</h2>
 
         {error && (
@@ -53,14 +41,14 @@ export default function Login() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-4">
           <div>
             <label className="block text-gray-300 text-sm font-medium mb-2">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors duration-200"
+              className="input-field" // Using our new style from index.css
               placeholder="Enter your email"
               required
             />
@@ -72,7 +60,7 @@ export default function Login() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors duration-200"
+              className="input-field" // Using our new style from index.css
               placeholder="Enter your password"
               required
             />
@@ -80,12 +68,13 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300"
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300 disabled:opacity-50"
           >
-            Login
+            {loading ? 'Logging in...' : 'Login'}
           </button>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
-  )
+  );
 }
