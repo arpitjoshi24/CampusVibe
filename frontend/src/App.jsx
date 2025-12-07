@@ -22,11 +22,14 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/events" element={<Eventpage />} />
-          <Route path="/pevent" element={<Pevent />} />
+         
           <Route path="/addevent" element={<Addevent />} />
           <Route path="/register" element={<Register />} />
+
           <Route path="/resources" element={<NeedResources/>} />
           <Route path="/signin" element={<Login />} /> {/* ✅ Added route */}
+          <Route path="/event/:id" element={<Pevent />} />
+
         </Routes>
       </main>
 

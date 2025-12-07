@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import sequelize from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import eventRoutes from './routes/eventRoutes.js';
+import registrationRoutes from './routes/registrationRoutes.js';
 import requirementRoutes from './routes/requirementRoutes.js';
 import User from './models/User.js';
 import Event from './models/Event.js';
@@ -40,6 +41,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/requirements', requirementRoutes);
+app.use("/api/registration", registrationRoutes);
+
 // ✅ Default route
 app.get('/', (req, res) => {
   res.send('🚀 Hackathon Server is Running!');

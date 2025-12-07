@@ -171,9 +171,12 @@ export default function Eventpage() {
                       <span className="text-gray-400 text-sm">
                         👤 {event.organizer}
                       </span>
-                      <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-5 py-2 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105">
-                        Register
-                      </button>
+                     <button
+  onClick={() => navigate(`/event/${event.id}`, { state: event })}
+  className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-5 py-2 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105"
+>
+  Register
+</button>
                     </div>
                   </div>
                 </div>
