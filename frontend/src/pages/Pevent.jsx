@@ -20,7 +20,7 @@ export default function Pevent() {
         onClick={() => navigate(-1)}
         className="mb-6 text-white bg-white/10 px-4 py-2 rounded-xl hover:bg-white/20 backdrop-blur-lg border border-white/10"
       >
-        ⬅ Back
+         Back
       </button>
 
       {/* Event Container */}

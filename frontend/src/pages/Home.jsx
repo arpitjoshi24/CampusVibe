@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 export default function Home() {
   const events = [
     {
@@ -65,9 +65,11 @@ export default function Home() {
             Your gateway to campus life. Discover events, join clubs, and connect with your community.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
-            <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+            <Link 
+            to="/events" 
+            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
               Explore Events
-            </button>
+            </Link>
             <button className="border-2 border-white/30 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-slate-900 transition-all duration-300 backdrop-blur-sm">
               Join Campus
             </button>

@@ -27,7 +27,7 @@ export default function Navbar() {
   }
 
   return (
-    <nav className='flex items-center px-8 py-4 bg-slate-900/80 backdrop-blur-lg border-b border-white/10 justify-between sticky top-0 z-50'>
+    <nav className='flex items-center px-8 py-4 bg-[#14152F] backdrop-blur-lg border-b border-white/10 justify-between sticky top-0 z-50'>
       {/* Logo */}
       <div className='flex items-center'>
         <Link
